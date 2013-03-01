@@ -1,8 +1,3 @@
-SJM
-===
-
-Simple Job Manager
-
 Simple Job Manager (SJM)
 ========================
 
