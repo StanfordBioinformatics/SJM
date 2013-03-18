@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+
+#
+# run_with_env - tweak the environment and then run a command
+#
+# Copyright(c) 2010-2012 The Board of Trustees of The Leland Stanford
+# Junior University.  All Rights Reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+# 
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+# 
+#     * Redistributions in binary form must reproduce the above
+#       copyright notice, this list of conditions and the following
+#       disclaimer in the documentation and/or other materials provided
+#       with the distribution.
+# 
+#     * Neither the name of Stanford University nor the names of its
+#       contributors may be used to endorse or promote products derived
+#       from this software without specific prior written permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL STANFORD
+# UNIVERSITY BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+use warnings;
+use strict;
+use Getopt::Long;
+require "$ENV{MODULESHOME}/init/perl";
+
+# Define a better module("list"): this one actually returns a module list.
+sub module_list {
+    my @mod_list = `$ENV{MODULESHOME}/bin/modulecmd perl list --terse 2>&1`;
+	
+    splice(@mod_list,0,1);    # Remove "Currently loaded modulefiles:" line.
+
+    # Tweak each module and make a new list.
+    my @mods = ();
+    foreach (@mod_list) {
+	chomp;            # Remove trailing \n's.
+	s/\(default\)//;  # Remove (default) following some modules.
+	push(@mods, $_);
+    }
+    return @mods;
+}
+
+# Define a better module("purge"): one that works.
+sub module_purge {
+    #
+    # NOTE: "purge" is broken as of 3.2.8.
+    #
+    #module("purge");
+    
+    # Get list of modules and remove each one.
+    for my $mod (module_list()) {
+      module("rm $mod");
+    }
+}
+
+if (@ARGV == 0) {
+    print "Usage: $0 [options] cmd args ...\n";
+    print "  --module MODULE    load the named environment module\n";
+    print "                     (may be a comma-separated list)\n";
+    print "  --verbose          print verbose messages\n";
+    exit 1;
+}
+
+my @modules = ();
+my $verbose = 0;
+my $result = GetOptions("module=s" => \@modules,
+			"verbose" => \$verbose);
+die "$0: invalid options\n" if (!$result);
+die "$0: missing command\n" if (@ARGV == 0);
+
+# Remove the currently loaded modules.
+module_purge();
+
+# Add the new modules.
+for my $module_arg (@modules) {
+    my @module_list = split(",", $module_arg);
+    for my $module (@module_list) {
+	print STDERR "Adding module: $module\n" if $verbose;
+	module("add $module") || die "$0: cannot load module $module\n";
+    }
+}
+
+# Run the command.
+print STDERR "Running command: " . join(" ", @ARGV) . "\n" if $verbose;
+exec(@ARGV);
+die "$0: cannot start command: @ARGV\n";

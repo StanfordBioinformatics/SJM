@@ -1,0 +1,37 @@
+/* config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* use Platform LSF */
+#undef HAVE_LSF
+
+/* Enable environment modules */
+#undef HAVE_MODULES
+
+/* use Sun Grid Engine */
+#undef HAVE_SGE
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* SGE parallel environment for multicore jobs */
+#undef SGE_MULTICORE_PE
+
+/* Version number of package */
+#undef VERSION

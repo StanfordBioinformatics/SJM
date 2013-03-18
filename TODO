@@ -1,0 +1,7 @@
+guess SGE arch automatically and set lib/include dirs
+try with boost shared object
+flush bug
+sge_options to sched_options
+
+git rm config.h.in
+discard changes to sjm.cc EXCEPT #undef HAVE_CONFIG_H
