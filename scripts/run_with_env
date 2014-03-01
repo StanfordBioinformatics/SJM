@@ -37,7 +37,7 @@
 use warnings;
 use strict;
 use Getopt::Long;
-require "$ENV{MODULESHOME}/init/perl";
+require "$ENV{MODULESHOME}/init/perl.pm";
 
 # Define a better module("list"): this one actually returns a module list.
 sub module_list {
