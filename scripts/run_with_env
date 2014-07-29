@@ -39,10 +39,19 @@ use strict;
 use Getopt::Long;
 require "$ENV{MODULESHOME}/init/perl.pm";
 
+my @modules = ();
+my $verbose = 0;
+
 # Define a better module("list"): this one actually returns a module list.
 sub module_list {
-    my @mod_list = `$ENV{MODULESHOME}/bin/modulecmd perl list --terse 2>&1`;
-	
+    #my @mod_list = `$ENV{MODULESHOME}/bin/modulecmd perl list --terse 2>&1`;
+    my $tmpmodlistfile = "/tmp/modulelist.$$";
+    module("list --terse > $tmpmodlistfile 2>&1");
+    open(MODLISTFILE, $tmpmodlistfile) || die("Unable to open module list file");
+    my @mod_list = <MODLISTFILE>;
+    close(MODLISTFILE);
+    #unlink($tmpmodlistfile);
+
     splice(@mod_list,0,1);    # Remove "Currently loaded modulefiles:" line.
 
     # Tweak each module and make a new list.
@@ -58,14 +67,16 @@ sub module_list {
 # Define a better module("purge"): one that works.
 sub module_purge {
     #
-    # NOTE: "purge" is broken as of 3.2.8.
+    # NOTE: "purge" is broken as of 3.2.8 -- fine as of 3.2.10.
     #
-    #module("purge");
+    print STDERR "Purging modules...\n" if $verbose;
+    module("purge");
     
     # Get list of modules and remove each one.
-    for my $mod (module_list()) {
-      module("rm $mod");
-    }
+    #for my $mod (module_list()) {
+    #	print STDERR "Removing module: $mod\n" if $verbose;
+    #	module("rm $mod");
+    #}
 }
 
 if (@ARGV == 0) {
@@ -76,22 +87,28 @@ if (@ARGV == 0) {
     exit 1;
 }
 
-my @modules = ();
-my $verbose = 0;
 my $result = GetOptions("module=s" => \@modules,
 			"verbose" => \$verbose);
 die "$0: invalid options\n" if (!$result);
 die "$0: missing command\n" if (@ARGV == 0);
 
+
+
 # Remove the currently loaded modules.
 module_purge();
 
-# Add the new modules.
+# Use a hash to keep track of all the modules being loaded.
+my %module_hash;
+
 for my $module_arg (@modules) {
     my @module_list = split(",", $module_arg);
     for my $module (@module_list) {
-	print STDERR "Adding module: $module\n" if $verbose;
-	module("add $module") || die "$0: cannot load module $module\n";
+       # Use hash to prevent loading the same module twice ("module add" doesn't like that).
+       if (!defined $module_hash{$module}) {
+          print STDERR "Adding module: $module\n" if $verbose;
+          module("add $module") || die "$0: cannot load module $module\n";
+          $module_hash{$module} = 1;
+       }
     }
 }
 
