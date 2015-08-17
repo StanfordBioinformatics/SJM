@@ -62,6 +62,8 @@ extern "C" {
 #include "job_mon.hh"
 #include "job_graph.hh"
 
+#include <boost/algorithm/string.hpp>
+
 using std::cin;
 using std::cout;
 using std::cerr;
@@ -259,10 +261,24 @@ JobMonitor::submit (const string& jobFile, const string& outFile,
 
     // send email
     if (mailAddr.size() != 0) {
-	ostringstream subject;
-	subject << "sjm ";
-	subject << (result ? "succeeded" : "failed");
-	subject << " on job file " << jobFile;
+
+				std::vector<std::string> strs;
+				boost::split(strs, jobFile, boost::is_any_of("/"));
+			  ostringstream subject;
+				if (strs.size() <= 1)
+				{
+					subject << "sjm ";
+					subject << (result ? "succeeded" : "failed");
+					subject << " on job file " << jobFile;
+				}
+				else
+				{
+					std::string shortPath = strs[ strs.size() -2] + "/" + strs[ strs.size() -1 ];
+					subject << "sjm ";
+					subject << (result ? "succeeded" : "failed");
+					subject << " on job file " << shortPath;
+			  }
+
 
 	ostringstream message;
 	message << "Job file: " << jobFile << "\n";
