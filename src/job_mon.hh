@@ -111,10 +111,10 @@ private:
 				// status-collection errors
 
     // default time intervals in seconds
-    static const unsigned defDispatchInterval = 30; // dispatch interval
-    static const unsigned defCheckJobInterval = 5*60; // check job status
-    static const unsigned defSaveInterval = 10*60; // save job status to disk
-    static const unsigned defLogInterval = 10*60; // log status message
+    static const unsigned defDispatchInterval = 10; // dispatch interval
+    static const unsigned defCheckJobInterval = 10; // check job status
+    static const unsigned defSaveInterval = 20; // save job status to disk
+    static const unsigned defLogInterval = 20; // log status message
 
     static const boost::regex filenameRE;
 
