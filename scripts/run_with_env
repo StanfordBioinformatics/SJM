@@ -37,7 +37,7 @@
 use warnings;
 use strict;
 use Getopt::Long;
-require "$ENV{MODULESHOME}/init/perl";
+require "$ENV{MODULESHOME}/init/perl.pm";
 
 # Define a better module("list"): this one actually returns a module list.
 sub module_list {
@@ -56,17 +56,17 @@ sub module_list {
 }
 
 # Define a better module("purge"): one that works.
-sub module_purge {
+#sub module_purge {
     #
     # NOTE: "purge" is broken as of 3.2.8.
-    #
-    #module("purge");
+    #but not in 3.2.10!
+#    module("purge");
     
     # Get list of modules and remove each one.
-    for my $mod (module_list()) {
-      module("rm $mod");
-    }
-}
+#    for my $mod (module_list()) {
+#      module("rm $mod");
+#    }
+#}
 
 if (@ARGV == 0) {
     print "Usage: $0 [options] cmd args ...\n";
@@ -84,8 +84,7 @@ die "$0: invalid options\n" if (!$result);
 die "$0: missing command\n" if (@ARGV == 0);
 
 # Remove the currently loaded modules.
-module_purge();
-
+module("purge");
 # Add the new modules.
 for my $module_arg (@modules) {
     my @module_list = split(",", $module_arg);
