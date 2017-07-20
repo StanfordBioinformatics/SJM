@@ -645,7 +645,7 @@ const regex JobGraphParser::exportRE("\\s*export\\s+([^\\s=]+)(=(\\S+))?\\s*");
 const regex JobGraphParser::moduleRE("\\s*module\\s+(\\S+)\\s*");
 const regex JobGraphParser::directoryRE("\\s*directory\\s+(\\S+)\\s*");
 const regex JobGraphParser::slotsRE("\\s*slots\\s+(\\d+)\\s*");
-const regex JobGraphParser::parallelEnvRE("\\s*parallel_env\\s+(\\s+)\\s*");
+const regex JobGraphParser::parallelEnvRE("\\s*parallel_env\\s+(\\S+)\\s*");
 
 JobGraphParser::JobGraphParser ():
     parseMode_(Start),
